@@ -1,0 +1,42 @@
+- name: Create VM for k3s server [count {{ vm_count }}]
+  community.general.proxmox_kvm:
+    api_host: "{{ proxmox_api_host }}"
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ vmid_template }}"
+    newid: "{{ item }}"
+    name: "{{ vm_server_name_prefix }}{{ item + 1 - vm_server_id }}"
+    clone: "{{ vm_server_name_prefix }}{{ item + 1 - vm_server_id }}"
+    state: present
+    timeout: "{{ vm_timeout }}"
+  loop: "{{ range(vm_server_id, vm_server_id + vm_count) | list }}"
+  register: vm_creation_result
+
+- name: Setting VM config
+  community.general.proxmox_kvm:
+    api_host: "{{ proxmox_api_host }}"
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ item }}"
+    memory: "{{ vm_server_memory }}"
+    cores: "{{ vm_server_cores }}"
+    ide:
+      ide2: 'NGFF:cloudinit,format=qcow2'
+    ciuser: "{{ vm_ciuser }}"
+    sshkeys: "{{ vm_sshkeys }}"
+    searchdomains: "{{ vm_domain }}"
+    nameservers: "{{ vm_dns }}"
+    ipconfig:
+      ipconfig0: "ip={{ vm_115_addr }}{{ vm_server_addr + item - vm_server_id }}/26,gw={{ vm_115_gw }}"
+    update: true
+  loop: "{{ range(vm_server_id, vm_server_id + vm_count) | list }}"
+  register: vm_creation_cloud_ini
+
+- name: Resiza disk in shell
+  ansible.builtin.command: qm disk resize {{ item }} scsi0 {{ vm_server_disk }}G
+  changed_when: lvs | grep vm-"{{ item }}"-disk-0 | awk '{print $4}' | sed 's/g//' | cut -d'.' -f1 != "{{ vm_server_disk }}"
+  ignore_errors: true
+  loop: "{{ range(vm_server_id, vm_server_id + vm_count) | list }}"
+  register: vm_resize_disk
