@@ -6,5 +6,5 @@
 - name: Create k3s server
   ansible.builtin.import_tasks: task_2_create_k3s_server.yml
 
-# - name: Create k3s worker
-#   ansible.builtin.import_tasks: task_3_create_k3s_worker.yml
+- name: Create k3s worker
+  ansible.builtin.import_tasks: task_3_create_k3s_worker.yml
