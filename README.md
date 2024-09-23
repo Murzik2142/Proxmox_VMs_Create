@@ -1,38 +1,78 @@
-Role Name
+Proxmox_VMs_Create_k3s
 =========
 
-A brief description of the role goes here.
+Creating virtual machines on Proxmox for subsequent deployment of the k3s cluster
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Proxmox 8.2.4+\
+ansible 3.1.2+\
+ansible-galaxy 2.16.11+\
+Not tested on earlier versions
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+___proxmox_api_host:___ "127.0.0.1"\
+___proxmox_api_user:___ "root@pam"\
+___proxmox_api_password:___ "password"\
+___proxmox_node:___ "pve"\
+___vmid:___ 100 - ID template in proxmox
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+Dependencies are absent
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+```
+# ansible-playbook -i inventory.yml playbook-VMs-create.yml
+- name: Create VMs in Proxmox
+  hosts: proxmox
+  vars:
+    proxmox_api_host: "proxmox1.home.local"
+    proxmox_api_user: "root@pam"
+    proxmox_api_password: "11111111"
+    proxmox_node: "proxmox1"
+    vm_count: 3
+    vm_ciuser: "murzik2142"
+    vm_sshkeys: "ssh-ed25519 AAAAC rpi1-b+
+          \nssh-ed25519 AAAAC srv-ansible
+          \nssh-ed25519 AAAAC PC-Marat-WSL"
+    vmid_template: 9001
+    vm_storage: "NGFF"
+    vm_network: '{"net0":"name=eth0,ip=dhcp,ip6=dhcp,bridge=vmbr0,tag=2"}'
+    vm_dns: '172.25.115.53'
+    vm_domain: 'home.local'
+    vm_115_addr: '172.25.115.'
+    vm_115_gw: "{{ vm_115_addr }}1"
+    # k3s vm server vars
+    vm_server_name_prefix: "k3s-server-"
+    vm_server_memory: 2048
+    vm_server_cores: 2
+    vm_server_id: 201
+    vm_server_addr: 31
+    vm_server_disk: 32
+    # k3s vm worker vars
+    vm_worker_name_prefix: "k3s-worker-"
+    vm_worker_memory: 4096
+    vm_worker_cores: 2
+    vm_worker_id: 301
+    vm_worker_addr: 41
+    vm_worker_disk: 64
+  roles:
+    - Proxmox_VMs_Create_k3s
+```
 
 License
 -------
 
-BSD
+BSD-3-Clause
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Murzabaev Marat (murzik2142@gmail.com)
