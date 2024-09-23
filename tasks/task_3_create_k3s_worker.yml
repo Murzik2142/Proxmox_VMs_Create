@@ -1,4 +1,4 @@
-- name: Create VM for k3s worker [count {{ vm_count }}]
+- name: Create VM for k3s worker [count {{ vm_count_worker }}]
   community.general.proxmox_kvm:
     api_host: "{{ proxmox_api_host }}"
     api_user: "{{ proxmox_api_user }}"
@@ -10,7 +10,7 @@
     clone: "{{ vm_worker_name_prefix }}{{ item + 1 - vm_worker_id }}"
     state: present
     timeout: "{{ vm_timeout }}"
-  loop: "{{ range(vm_worker_id, vm_worker_id + vm_count) | list }}"
+  loop: "{{ range(vm_worker_id, vm_worker_id + vm_count_worker) | list }}"
   register: vm_creation_result
 
 - name: Setting VM config
@@ -31,12 +31,12 @@
     ipconfig:
       ipconfig0: "ip={{ vm_115_addr }}{{ vm_worker_addr + item - vm_worker_id }}/26,gw={{ vm_115_gw }}"
     update: true
-  loop: "{{ range(vm_worker_id, vm_worker_id + vm_count) | list }}"
+  loop: "{{ range(vm_worker_id, vm_worker_id + vm_count_worker) | list }}"
   register: vm_creation_cloud_ini
 
 - name: Resiza disk in shell
   ansible.builtin.command: qm disk resize {{ item }} scsi0 {{ vm_worker_disk }}G
   changed_when: lvs | grep vm-"{{ item }}"-disk-0 | awk '{print $4}' | sed 's/g//' | cut -d'.' -f1 != "{{ vm_worker_disk }}"
   ignore_errors: true
-  loop: "{{ range(vm_worker_id, vm_worker_id + vm_count) | list }}"
+  loop: "{{ range(vm_worker_id, vm_worker_id + vm_count_worker) | list }}"
   register: vm_resize_disk

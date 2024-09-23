@@ -4,7 +4,6 @@ proxmox_api_host: "127.0.0.1"
 proxmox_api_user: "root@pam"
 proxmox_api_password: "password"
 proxmox_node: "pve" 
-vm_count: 3
 vmid_template: 100
 vm_storage: "local-lvm"
 vm_network: '{"net0":"name=eth0,ip=dhcp,ip6=dhcp,bridge=vmbr0,tag=2"}'
@@ -18,6 +17,7 @@ vm_ciuser: "user"
 vm_sshkeys: "ssh-ed25519 AAAAkeytest1 key1
       \nssh-rsa AAAAkeytest2 key2"
 # k3s vm server vars
+vm_count_server: 3
 vm_server_name_prefix: "k3s-server-"
 vm_server_memory: 2048
 vm_server_cores: 2
@@ -25,6 +25,7 @@ vm_server_id: 201
 vm_server_addr: 31
 vm_server_disk: 32
 # k3s vm worker vars
+vm_count_worker: 3
 vm_worker_name_prefix: "k3s-worker-"
 vm_worker_memory: 4096
 vm_worker_cores: 2
