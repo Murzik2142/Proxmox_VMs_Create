@@ -37,7 +37,6 @@ Example Playbook
     proxmox_api_user: "root@pam"
     proxmox_api_password: "11111111"
     proxmox_node: "proxmox1"
-    vm_count: 3
     vm_ciuser: "murzik2142"
     vm_sshkeys: "ssh-ed25519 AAAAC rpi1-b+
           \nssh-ed25519 AAAAC srv-ansible
@@ -50,6 +49,7 @@ Example Playbook
     vm_115_addr: '172.25.115.'
     vm_115_gw: "{{ vm_115_addr }}1"
     # k3s vm server vars
+    vm_count_server: 3
     vm_server_name_prefix: "k3s-server-"
     vm_server_memory: 2048
     vm_server_cores: 2
@@ -57,6 +57,7 @@ Example Playbook
     vm_server_addr: 31
     vm_server_disk: 32
     # k3s vm worker vars
+    vm_count_worker: 3
     vm_worker_name_prefix: "k3s-worker-"
     vm_worker_memory: 4096
     vm_worker_cores: 2
