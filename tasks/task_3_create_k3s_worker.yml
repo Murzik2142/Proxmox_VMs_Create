@@ -4,7 +4,7 @@
     api_user: "{{ proxmox_api_user }}"
     api_password: "{{ proxmox_api_password }}"
     node: "{{ proxmox_node }}"
-    vmid: "{{ vmid_template }}"
+    vmid: "{{ vmid }}"
     newid: "{{ item }}"
     name: "{{ vm_worker_name_prefix }}{{ item + 1 - vm_worker_id }}"
     clone: "{{ vm_worker_name_prefix }}{{ item + 1 - vm_worker_id }}"
