@@ -4,7 +4,7 @@ proxmox_api_host: "127.0.0.1"
 proxmox_api_user: "root@pam"
 proxmox_api_password: "password"
 proxmox_node: "pve" 
-vmid_template: 100
+vmid: 100
 vm_storage: "local-lvm"
 vm_network: '{"net0":"name=eth0,ip=dhcp,ip6=dhcp,bridge=vmbr0,tag=2"}'
 vm_dns: '172.25.115.1'
