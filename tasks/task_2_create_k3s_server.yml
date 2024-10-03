@@ -22,7 +22,7 @@
     memory: "{{ vm_server_memory }}"
     cores: "{{ vm_server_cores }}"
     ide:
-      ide2: 'NGFF:cloudinit,format=qcow2'
+      ide2: '{{ vm_storage }}:cloudinit,format=qcow2'
     ciuser: "{{ vm_ciuser }}"
     sshkeys: "{{ vm_sshkeys }}"
     searchdomains: "{{ vm_domain }}"
