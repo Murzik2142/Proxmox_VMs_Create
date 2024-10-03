@@ -1,4 +1,4 @@
-- name: Create VM for k3s server [count {{ vm_count_server }}]
+- name: Create VM for k3s server [count {{ groups['k3s-master'] | length  }}]
   community.general.proxmox_kvm:
     api_host: "{{ proxmox_api_host }}"
     api_user: "{{ proxmox_api_user }}"
@@ -28,7 +28,7 @@
     searchdomains: "{{ vm_domain }}"
     nameservers: "{{ vm_dns }}"
     ipconfig:
-      ipconfig0: "ip={{ hostvars[item].ansible_host }}/26,gw={{ vm_115_gw }}"
+      ipconfig0: "ip={{ hostvars[item].ansible_host }}/{{ vm_mask }},gw={{ vm_gw }}"
     update: true
   loop: "{{ groups['k3s-master'] }}"
 

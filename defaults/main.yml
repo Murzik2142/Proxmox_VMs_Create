@@ -9,8 +9,9 @@ vm_storage: "local-lvm"
 vm_network: '{"net0":"name=eth0,ip=dhcp,ip6=dhcp,bridge=vmbr0,tag=2"}'
 vm_dns: '172.25.115.1'
 vm_domain: 'test.local'
-vm_115_addr: '172.25.115.'
-vm_115_gw: "{{ vm_115_addr }}1"
+vm_addr: '172.25.115.'
+vm_gw: "{{ vm_addr }}1"
+vm_mask: "26"
 vm_timeout: 120
 # user data
 vm_ciuser: "user"
