@@ -4,14 +4,13 @@
     api_user: "{{ proxmox_api_user }}"
     api_password: "{{ proxmox_api_password }}"
     node: "{{ proxmox_node }}"
-    vmid: "{{ vmid }}"
-    newid: "{{ item }}"
-    name: "{{ vm_worker_name_prefix }}{{ item + 1 - vm_worker_id }}"
-    clone: "{{ vm_worker_name_prefix }}{{ item + 1 - vm_worker_id }}"
+    vmid: "{{ vmid_template }}"
+    newid: "{{ hostvars[item].ansible_vmid }}"
+    name: "{{ hostvars[item].inventory_hostname }}"
+    clone: "{{ hostvars[item].inventory_hostname }}"
     state: present
     timeout: "{{ vm_timeout }}"
-  loop: "{{ range(vm_worker_id, vm_worker_id + vm_count_worker) | list }}"
-  register: vm_creation_result
+  loop: "{{ groups['k3s-worker'] }}"
 
 - name: Setting VM config
   community.general.proxmox_kvm:
@@ -19,9 +18,9 @@
     api_user: "{{ proxmox_api_user }}"
     api_password: "{{ proxmox_api_password }}"
     node: "{{ proxmox_node }}"
-    vmid: "{{ item }}"
-    memory: "{{ vm_worker_memory }}"
-    cores: "{{ vm_worker_cores }}"
+    vmid: "{{ hostvars[item].ansible_vmid }}"
+    memory: "{{ vm_server_memory }}"
+    cores: "{{ vm_server_cores }}"
     ide:
       ide2: 'NGFF:cloudinit,format=qcow2'
     ciuser: "{{ vm_ciuser }}"
@@ -29,14 +28,12 @@
     searchdomains: "{{ vm_domain }}"
     nameservers: "{{ vm_dns }}"
     ipconfig:
-      ipconfig0: "ip={{ vm_115_addr }}{{ vm_worker_addr + item - vm_worker_id }}/26,gw={{ vm_115_gw }}"
+      ipconfig0: "ip={{ hostvars[item].ansible_host }}/26,gw={{ vm_115_gw }}"
     update: true
-  loop: "{{ range(vm_worker_id, vm_worker_id + vm_count_worker) | list }}"
-  register: vm_creation_cloud_ini
+  loop: "{{ groups['k3s-worker'] }}"
 
 - name: Resiza disk in shell
-  ansible.builtin.command: qm disk resize {{ item }} scsi0 {{ vm_worker_disk }}G
-  changed_when: lvs | grep vm-"{{ item }}"-disk-0 | awk '{print $4}' | sed 's/g//' | cut -d'.' -f1 != "{{ vm_worker_disk }}"
+  ansible.builtin.command: qm disk resize {{ hostvars[item].ansible_vmid }} scsi0 {{ vm_server_disk }}G
+  changed_when: lvs | grep vm-"{{ hostvars[item].ansible_vmid }}"-disk-0 | awk '{print $4}' | sed 's/g//' | cut -d'.' -f1 != "{{ vm_server_disk }}"
   ignore_errors: true
-  loop: "{{ range(vm_worker_id, vm_worker_id + vm_count_worker) | list }}"
-  register: vm_resize_disk
+  loop: "{{ groups['k3s-worker'] }}"
